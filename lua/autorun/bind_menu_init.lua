@@ -1,1 +1,1 @@
-include("../ttt_bind_menu/bind_menu.lua")
+include("../ttt_bind_menu/vgui/bind_menu.lua")
