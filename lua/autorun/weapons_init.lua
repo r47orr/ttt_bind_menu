@@ -80,4 +80,3 @@ hook.Add('OnGamemodeLoaded', 'TTTBindMenu.GamemodeLoaded', function()
 
     IncludeDir(RootDir)
 end)
--- IncludeDir(RootDir)
