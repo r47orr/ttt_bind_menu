@@ -2,6 +2,7 @@ if RayHUDTTT then return end
 
 local allowed_ranks = TTTBindMenu.config:FetchSingle('choice_allowed_ranks')
 local config_ranks = TTTBindMenu.config:FetchSingle('config_allowed_ranks')
+local binds = {}
 
 function GetAimedPlayer(ply)
     local trace = util.TraceLine({
@@ -91,7 +92,10 @@ local function deleteSettings()
     -- Lógica para editar as configurações aqui
 end
 
+
+
     if (!allowed_ranks[LocalPlayer():GetUserGroup()] and !config_ranks[LocalPlayer():GetUserGroup()]) then return end
+
 
     local tab = vgui.Create( "DPanel", dtabs )
     tab:Dock(FILL)
@@ -104,14 +108,16 @@ end
     
    
 
-    local function AddRow(panel)
+    local function AddRow(panel, bind, key)
+
+        -- if bind == nil and binds[key] == nil then return end
 
         local row = CreateRow(panel1scroll)
         local dropdown = vgui.Create("DComboBox", row)
         dropdown:SetSize(100, 20) -- Defina o tamanho desejado do dropdown menu
         dropdown:AddChoice("Player")
         dropdown:AddChoice("Eu")
-        dropdown:AddChoice("Opção 3")
+        dropdown:AddChoice("Chat")
         dropdown:ChooseOptionID(1)
     
         dropdown.Paint = function(self, w, h)
@@ -132,7 +138,19 @@ end
         spacerPanel:Dock(FILL)
         
         -- Adicionando um botão para definição de tecla à linha
-        local keybindButton = CreateKeybindButton(spacerPanel, "Definir Tecla")
+        local keybindButton = nil
+
+        if bind == nil then
+            keybindButton = CreateKeybindButton(spacerPanel, "Definir Tecla");
+
+        else
+            keybindButton = CreateKeybindButton(spacerPanel, string.upper(key))
+            textField:SetValue(bind)
+            textField:SetEditable(false)
+            keybindButton.DoCLick = function() return end 
+            textField:SetTextColor(Color(150, 150, 150))
+        end
+        
         keybindButton:Dock(FILL)
         keybindButton:DockMargin(5, 5, 5, 5)
 
@@ -142,7 +160,9 @@ end
         saveButton:SetSize(50, 20)
         saveButton:Dock(RIGHT)
         saveButton:DockMargin(5, 5, 5, 5)
-        saveButton.DoClick = deleteSettings
+        saveButton.DoClick = function ()
+
+        end
     
         -- Adicionando botões "Salvar" e "Editar" na mesma linha
         local saveButton = vgui.Create("DButton", row)
@@ -150,25 +170,46 @@ end
         saveButton:SetSize(50, 20)
         saveButton:Dock(RIGHT)
         saveButton:DockMargin(5, 5, 5, 5)
-        saveButton.DoClick = SaveSettings
+        saveButton.DoClick = function ()
+            textField:SetTextColor(Color(150, 150, 150))
+            textField:SetEditable(false)
+        end
     
         local editButton = vgui.Create("DButton", row)
         editButton:SetText("Editar")
         editButton:SetSize(50, 20)
         editButton:Dock(RIGHT)
         editButton:DockMargin(5, 5, 5, 5)
-        editButton.DoClick = EditSettings
+        editButton.DoClick = function ()
+            textField:SetEditable(true)
+            textField:SetTextColor(Color(0, 0, 0))
+        end
     end
 
+    local function ListBinds(panel1scroll)
+    
+     
+        -- Executa o comando e armazena os binds na tabela
+        for i = 1, 159 do
+            local key = input.GetKeyName(i)
+            local bind = input.LookupKeyBinding(i)
+    
+            if bind and bind ~= "" then
+                binds[key] = bind
+                AddRow(panel1scroll,bind,key)
+            end
+        end
+    
+    end
 
-        AddRow(panel1scroll)
+    ListBinds(panel1scroll)
 
     local addButton = vgui.Create("DButton", tab)
     addButton:SetText("Adicionar Linha")
     addButton:Dock(BOTTOM)
     addButton:DockMargin(5, 5, 5, 5)
     addButton.DoClick = function()
-        AddRow(panel1scroll)
+        AddRow(panel1scroll, nil,nil)
     end
 
     dtabs:AddSheet("Bind", tab , "icon16/award_star_add.png")
