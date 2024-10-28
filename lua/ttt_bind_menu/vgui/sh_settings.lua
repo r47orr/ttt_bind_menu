@@ -34,7 +34,7 @@ end)
 
 
 
-hook.Add("TTTSettingsTabs", "TTTWeaponsMenuSettingsTabInitialize", function(dtabs)
+hook.Add("TTTSettingsTabs", "TTTBindsMenuSettingsTabInitialize", function(dtabs)
 
     local function CreateRow(parent)
         local row = vgui.Create("DPanel", parent)
